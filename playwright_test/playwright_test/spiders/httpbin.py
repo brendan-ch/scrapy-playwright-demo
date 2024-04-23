@@ -1,9 +1,11 @@
 import scrapy
 from scrapy.settings import BaseSettings
 
-class PlaywrightSpider(scrapy.Spider):
-    name = "playwright_1"
-    allowed_domains = ["youtube.com", "httpbin.org"]
+# Sample code taken from https://github.com/scrapy-plugins/scrapy-playwright?tab=readme-ov-file#basic-usage
+
+class HTTPBinSpider(scrapy.Spider):
+    name = "httpbin"
+    allowed_domains = ["httpbin.org"]
     # start_urls = ["https://youtube.com/feed/trending"]
 
     @classmethod
