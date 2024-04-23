@@ -11,12 +11,16 @@ class HTTPBinSpider(scrapy.Spider):
     @classmethod
     def update_settings(cls, settings: BaseSettings) -> None:
         super().update_settings(settings)
-        settings.set("DOWNLOAD_HANDLERS", {
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        })
+        
+        # These settings are necessary for playwright; they can be set here
+        # or in the settings.py project file
 
-        settings.set("TWISTED_REACTOR", "twisted.internet.asyncioreactor.AsyncioSelectorReactor")
+        # settings.set("DOWNLOAD_HANDLERS", {
+        #     "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        #     "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        # })
+
+        # settings.set("TWISTED_REACTOR", "twisted.internet.asyncioreactor.AsyncioSelectorReactor")
 
     def start_requests(self):
         yield scrapy.Request("https://httpbin.org/get", meta={"playwright": True})

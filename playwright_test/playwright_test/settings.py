@@ -19,6 +19,14 @@ NEWSPIDER_MODULE = "playwright_test.spiders"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+# Playwright stuff
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
+
+
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 

@@ -13,12 +13,16 @@ class GoogleSpider(scrapy.Spider):
     @classmethod
     def update_settings(cls, settings: BaseSettings) -> None:
         super().update_settings(settings)
-        settings.set("DOWNLOAD_HANDLERS", {
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        })
 
-        settings.set("TWISTED_REACTOR", "twisted.internet.asyncioreactor.AsyncioSelectorReactor")
+        # These settings are necessary for playwright; they can be set here
+        # or in the settings.py project file
+
+        # settings.set("DOWNLOAD_HANDLERS", {
+        #     "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        #     "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        # })
+
+        # settings.set("TWISTED_REACTOR", "twisted.internet.asyncioreactor.AsyncioSelectorReactor")
 
     def start_requests(self):
         url = "https://www.google.com/search?q=scrapy"
