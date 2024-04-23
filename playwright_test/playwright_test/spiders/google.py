@@ -4,6 +4,8 @@ import scrapy
 from scrapy.settings import BaseSettings
 
 # Spider which attempts to crawl a Google Search page
+# With Google most elements are rendered server-side, so
+# JavaScript/Playwright is NOT required
 
 class GoogleSpider(scrapy.Spider):
     name = "google"
@@ -31,7 +33,13 @@ class GoogleSpider(scrapy.Spider):
         if query is not None:
             url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
 
-        yield scrapy.Request(url, meta={"playwright": True})
+        yield scrapy.Request(url)
+        # yield scrapy.Request(url, meta={"playwright": True})
 
     def parse(self, response, **kwargs):
-        return {"url": response.url}
+        # Based on the structure of Google search
+        selectors = response.xpath("//h3/div")
+        for selector in selectors: # type: ignore
+            yield {
+                "title": selector.css("::text").get(),
+            }
