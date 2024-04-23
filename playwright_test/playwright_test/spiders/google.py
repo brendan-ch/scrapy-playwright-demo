@@ -42,4 +42,9 @@ class GoogleSpider(scrapy.Spider):
         for selector in selectors: # type: ignore
             yield {
                 "title": selector.css("::text").get(),
+                # TODO: store the link of the result
+
+                # consider:
+                # - implementing link following to gather even more data
+                # - feeding the scraped data to an LLM which accepts unstructured data
             }
