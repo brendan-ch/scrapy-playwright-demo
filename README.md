@@ -13,12 +13,6 @@ python -m venv <location> && source <location>/bin/activate
 pip install -r requirements.txt
 ```
 
-Change the working directory to the Scrapy project `playwright_test`:
-
-```plaintext
-cd playwright_test
-```
-
 Spiders (which contain web crawling logic) are located under the
 `playwright_test/playwright_test/spiders` module. To run a spider by name:
 
