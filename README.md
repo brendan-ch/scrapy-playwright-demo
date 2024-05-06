@@ -6,15 +6,28 @@ using [Playwright](http://playwright.dev) with Scrapy's web crawling capabilitie
 
 ## Getting Started
 
-Set up Scrapy by creating a [Python virtual environment](https://docs.python.org/3/library/venv.html) and installing dependencies.
+This project uses a `conda` environment for package installation. [Start by installing `conda` through Miniconda](https://docs.anaconda.com/free/miniconda/) or another method.
+
+Verify `conda` is installed:
 
 ```plaintext
-python -m venv <location> && source <location>/bin/activate
-pip install -r requirements.txt
+conda info
 ```
 
-Spiders (which contain web crawling logic) are located under the
-`playwright_test/playwright_test/spiders` module. To run a spider by name:
+Then, activate the Conda environment:
+
+```plaintext
+conda env create -f env.yml
+```
+
+This will create a new environment named `scrapy-demo`, installing necessary dependencies.
+
+Finally, activate the environment:
+```plaintext
+conda activate scrapy-demo
+```
+
+You'll now be able to run Scrapy. Spiders (which contain web crawling logic) are located under the `playwright_test/spiders` module. To run a spider by name:
 
 ```plaintext
 scrapy crawl <spider name>
