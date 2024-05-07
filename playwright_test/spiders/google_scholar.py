@@ -23,7 +23,6 @@ class GoogleScholar(scrapy.Spider):
             # Select the href attribute
             yield {
                 "href": heading.css("::attr(href)").get(),
-                # TODO: fix text extraction
-                "title": heading.css("::text").get(),
+                "title": ''.join(heading.css("::text").getall()),
             }
         
