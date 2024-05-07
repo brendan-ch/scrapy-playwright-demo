@@ -1,6 +1,8 @@
 import urllib.parse
 import scrapy
 
+# Spider which crawls Google Scholar search results, returning links and titles.
+
 class GoogleScholar(scrapy.Spider):
     name = "google_scholar"
     allowed_domains = ["scholar.google.com"]
