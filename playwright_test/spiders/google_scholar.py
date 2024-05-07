@@ -18,7 +18,7 @@ class GoogleScholar(scrapy.Spider):
     
     def parse(self, response, **kwargs):
         selectors_containing_links = response.xpath("//div[h3]")
-        headings = selectors_containing_links.xpath("//h3[a]")
+        headings = selectors_containing_links.xpath(".//h3[a]")
         for heading in headings:
             # Select the href attribute
             yield {
