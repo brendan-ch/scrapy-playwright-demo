@@ -1,7 +1,5 @@
 import urllib.parse
-from pathlib import Path
 import scrapy
-from scrapy.settings import BaseSettings
 
 class GoogleScholar(scrapy.Spider):
     name = "google_scholar"
