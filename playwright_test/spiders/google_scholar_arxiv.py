@@ -47,17 +47,16 @@ class GoogleScholarArxiv(scrapy.Spider):
         if response.request.url.count("arxiv.org") > 0:
             # arxiv.org logic
             title = response.css(".title::text").get()
-
-            # TODO: get the authors correctly
-            authors = response.css(".author > a")
-            print(authors)
+            authors = response.css(".authors > a::text").getall()
+            abstract = "".join(response.css(".abstract::text").getall()).strip()
 
             return {
                 "site": "arxiv.org",
                 "title": title,
                 # Potential application: find out which authors
                 # the researcher collaborates with the most
-                # "authors": 
+                "authors": authors,
+                "abstract": abstract,
             }
 
         else:
