@@ -15,6 +15,10 @@ class GoogleScholarArxiv(scrapy.Spider):
     allowed_domains = ["scholar.google.com", "arxiv.org"]
     visited_scholar_pages: set[str] = set()
 
+    starting_result_limit = 100
+    """Limit the number of results, or the number of pagination links followed.
+    The start= value of the page visited will not exceed this value."""
+
     def start_requests(self):
         query = getattr(self, "query", None)
         if query is None:
@@ -43,15 +47,22 @@ class GoogleScholarArxiv(scrapy.Spider):
                 }
 
                 # Follow the link
-                yield response.follow(href)
+                # yield response.follow(href)
 
             # Grab links to additional results for selectors that are in tables
             link_selectors_in_tables = response.xpath("//table//a")
             for link_selector in link_selectors_in_tables:
                 href: str = link_selector.css("::attr(href)").get()
-                if href.count("/scholar") > 0 and href not in self.visited_scholar_pages:
-                    self.visited_scholar_pages.add(href)
-                    yield response.follow(href)
+                if "/scholar?start=" in href and href not in self.visited_scholar_pages:
+                    start_str = ""
+                    start_pos = href.find("start=") + 6
+                    while href[start_pos].isdigit():
+                        start_str += href[start_pos]
+                    
+                    start = int(start_str)
+                    if start < self.starting_result_limit:
+                        self.visited_scholar_pages.add(href)
+                        yield response.follow(href)
             
 
     def handle_follow(self, response):
