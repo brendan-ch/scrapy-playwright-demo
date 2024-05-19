@@ -13,6 +13,7 @@ import scrapy
 class GoogleScholarArxiv(scrapy.Spider):
     name = "google_scholar_arxiv"
     allowed_domains = ["scholar.google.com", "arxiv.org"]
+    visited_scholar_pages: set[str] = set()
 
     def start_requests(self):
         query = getattr(self, "query", None)
@@ -29,19 +30,29 @@ class GoogleScholarArxiv(scrapy.Spider):
             # Hand off to helper function
             yield self.handle_follow(response)
         else:
+            # Grab links to articles
             selectors_containing_links = response.xpath("//div[h3]")
             headings = selectors_containing_links.xpath(".//h3[a]")
-            for heading in headings:
-                href = heading.css("::attr(href)").get()
+            for heading_selector in headings:
+                href = heading_selector.css("::attr(href)").get()
                 # Select the href attribute
                 yield {
                     "site": "scholar.google.com",
                     "href": href,
-                    "title": ''.join(heading.css("::text").getall()),
+                    "title": ''.join(heading_selector.css("::text").getall()),
                 }
 
                 # Follow the link
                 yield response.follow(href)
+
+            # Grab links to additional results for selectors that are in tables
+            link_selectors_in_tables = response.xpath("//table//a")
+            for link_selector in link_selectors_in_tables:
+                href: str = link_selector.css("::attr(href)").get()
+                if href.count("/scholar") > 0 and href not in self.visited_scholar_pages:
+                    self.visited_scholar_pages.add(href)
+                    yield response.follow(href)
+            
 
     def handle_follow(self, response):
         if response.request.url.count("arxiv.org") > 0:
