@@ -4,6 +4,9 @@ A sample [Scrapy](https://scrapy.org)-based project containing several web crawl
 [scrapy-playwright](https://github.com/scrapy-plugins/scrapy-playwright), a plugin integrating headless browser support
 using [Playwright](http://playwright.dev) with Scrapy's web crawling capabilities.
 
+See [Web Scraping Notes](https://brendanchen.craft.me/n42/039/web-scraping) for background regarding this repository.
+To set up the project, continue reading this README.
+
 ## Getting Started
 
 This project uses a `conda` environment for package installation. [Start by installing `conda` through Miniconda](https://docs.anaconda.com/free/miniconda/) or another method.
