@@ -41,15 +41,19 @@ class GoogleScholarArxiv(scrapy.Spider):
             yield self.handle_follow(response)
         else:
             # Grab links to articles
-            selectors_containing_links = response.xpath("//div[h3]")
-            headings = selectors_containing_links.xpath(".//h3[a]")
-            for heading_selector in headings:
+            selectors_containing_links = response.xpath("//div[div/h3]")
+            for selector in selectors_containing_links:
+                heading_selector = selector.xpath(".//h3[a]")
                 href = heading_selector.css("::attr(href)").get()
+                title = ''.join(heading_selector.css("::text").getall())
+                pdf_link = selector.xpath(".//a[span[contains(text(), '[PDF]')]]").css("::attr(href)").get()
+
                 # Select the href attribute
                 yield {
                     "site": "scholar.google.com",
                     "href": href,
-                    "title": ''.join(heading_selector.css("::text").getall()),
+                    "title": title,
+                    "pdf_link": pdf_link
                 }
 
                 # Follow the link
