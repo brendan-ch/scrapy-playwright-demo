@@ -42,7 +42,46 @@ the `scrapy.Spider` subclasses.
 To run the spider and save the output to a file:
 
 ```
-scrapy crawl <spider name> -O <filename>
+scrapy crawl <spider name> -O "[filename].jsonl"
 ```
 
 This will save the output to a [JSON Lines](http://jsonlines.org/) file.
+
+See the next section for the currently available Spiders and their arguments.
+
+## Available Spiders
+
+### `google_scholar_arxiv`
+
+This spider crawls Arxiv results on Google Scholar, following links to Arxiv pages to gather more information. It returns a variety of different object types.
+
+To run the spider with file output, use the following:
+```
+scrapy crawl google_scholar_arxiv -O "[filename].jsonl" -a query="[Google Scholar search query]" [-a download="1"]
+```
+
+The `download` argument is optional and solely exists if you want to download associated PDFs with papers.
+
+### `google_scholar`
+
+This spider crawls Google Scholar results, returning the title and link of each result.
+
+To run the spider with file output, use the following:
+```
+scrapy crawl google_scholar_arxiv -O "[filename].jsonl" -a query="[Google Scholar search query]"
+```
+
+### `httpbin`
+
+This sample code was taken from the [Scrapy Playwright repository](https://github.com/scrapy-plugins/scrapy-playwright?tab=readme-ov-file#basic-usage).
+
+### `google`
+
+This spider crawls Google results, returning the title of each result.
+
+To run the spider with file output, use the following:
+```
+scrapy crawl google -O "[filename].jsonl" [-a query="[Google search query]"]
+```
+
+Without the -a flag, the spider searches results for "scrapy".
