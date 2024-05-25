@@ -19,6 +19,10 @@ class GoogleScholarArxiv(scrapy.Spider):
     """Limit the number of results, or the number of pagination links followed.
     The start= value of the page visited will not exceed this value."""
 
+    downloads_enabled = False
+    """If set to true (via argument passed by user), the spider will attempt to
+    access PDF download links and download papers into the tmp folder."""
+
     def start_requests(self):
         query = getattr(self, "query", None)
         if query is None:
@@ -26,6 +30,8 @@ class GoogleScholarArxiv(scrapy.Spider):
         else:
             query += " site:arxiv.org"
 
+        self.downloads_enabled = getattr(self, "download", None) == "1"
+    
         url = f"https://scholar.google.com/scholar?q={urllib.parse.quote(query)}"
         yield scrapy.Request(url, meta={"playwright": True})
     
