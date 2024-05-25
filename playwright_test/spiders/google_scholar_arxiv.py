@@ -47,17 +47,22 @@ class GoogleScholarArxiv(scrapy.Spider):
                 }
 
                 # Follow the link
-                # yield response.follow(href)
+                yield response.follow(href)
 
             # Grab links to additional results for selectors that are in tables
             link_selectors_in_tables = response.xpath("//table//a")
             for link_selector in link_selectors_in_tables:
                 href: str = link_selector.css("::attr(href)").get()
                 if "/scholar?start=" in href and href not in self.visited_scholar_pages:
+                    # For context, a typical paged Google Scholar link looks like this:
+                    # https://scholar.google.com/scholar?start=10&q=artificial+intelligence&hl=en&as_sdt=0,31
+                    # This bit grabs the starting position (the query parameter to start)
+
                     start_str = ""
                     start_pos = href.find("start=") + 6
                     while href[start_pos].isdigit():
                         start_str += href[start_pos]
+                        start_pos += 1
                     
                     start = int(start_str)
                     if start < self.starting_result_limit:
