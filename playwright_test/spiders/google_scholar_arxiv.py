@@ -56,7 +56,7 @@ class GoogleScholarArxiv(scrapy.Spider):
             # Follow the link
             yield response.follow(href, self.handle_arxiv_follow)
 
-            if self.downloads_enabled:
+            if self.downloads_enabled and pdf_link is not None:
                 yield response.follow(pdf_link, self.handle_save_pdf)
 
         # Grab links to additional results for selectors that are in tables
