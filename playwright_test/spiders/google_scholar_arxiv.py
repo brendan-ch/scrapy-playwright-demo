@@ -1,3 +1,4 @@
+import os
 import urllib.parse
 import scrapy
 
@@ -55,6 +56,9 @@ class GoogleScholarArxiv(scrapy.Spider):
             # Follow the link
             yield response.follow(href, self.handle_arxiv_follow)
 
+            if self.downloads_enabled:
+                yield response.follow(pdf_link, self.handle_save_pdf)
+
         # Grab links to additional results for selectors that are in tables
         link_selectors_in_tables = response.xpath("//table//a")
         for link_selector in link_selectors_in_tables:
@@ -91,3 +95,29 @@ class GoogleScholarArxiv(scrapy.Spider):
             "abstract": abstract,
         }
         
+
+        
+    def handle_save_pdf(self, response, **kwargs):
+        tmp_folder = os.path.join(os.getcwd(), 'tmp')
+        
+        # If the tmp folder doesn't exist, create it
+        if not os.path.exists(tmp_folder):
+            os.makedirs(tmp_folder)
+        
+        # Get the original file name from the response URL, so we can associate it
+        # with a link and therefore a result
+        pdf_url = response.url
+        file_name = pdf_url.split('/')[-1]
+        if file_name is not None and not file_name.endswith('.pdf'):
+            file_name += '.pdf'
+
+        file_path = os.path.join(tmp_folder, file_name)
+        
+        # Save the PDF to the tmp folder
+        with open(file_path, 'wb') as f:
+            f.write(response.body)
+
+        return {
+            "pdf_link": pdf_url,
+            "file_name": file_name,
+        }
