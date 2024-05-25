@@ -36,65 +36,58 @@ class GoogleScholarArxiv(scrapy.Spider):
         yield scrapy.Request(url, meta={"playwright": True})
     
     def parse(self, response, **kwargs):
-        if response.request.url.count("scholar.google.com") == 0:
-            # Hand off to helper function
-            yield self.handle_follow(response)
-        else:
-            # Grab links to articles
-            selectors_containing_links = response.xpath("//div[div/h3]")
-            for selector in selectors_containing_links:
-                heading_selector = selector.xpath(".//h3[a]")
-                href = heading_selector.css("::attr(href)").get()
-                title = ''.join(heading_selector.css("::text").getall())
-                pdf_link = selector.xpath(".//a[span[contains(text(), '[PDF]')]]").css("::attr(href)").get()
+        # Grab links to articles
+        selectors_containing_links = response.xpath("//div[div/h3]")
+        for selector in selectors_containing_links:
+            heading_selector = selector.xpath(".//h3[a]")
+            href = heading_selector.css("::attr(href)").get()
+            title = ''.join(heading_selector.css("::text").getall())
+            pdf_link = selector.xpath(".//a[span[contains(text(), '[PDF]')]]").css("::attr(href)").get()
 
-                # Select the href attribute
-                yield {
-                    "site": "scholar.google.com",
-                    "href": href,
-                    "title": title,
-                    "pdf_link": pdf_link
-                }
-
-                # Follow the link
-                yield response.follow(href)
-
-            # Grab links to additional results for selectors that are in tables
-            link_selectors_in_tables = response.xpath("//table//a")
-            for link_selector in link_selectors_in_tables:
-                href: str = link_selector.css("::attr(href)").get()
-                if "/scholar?start=" in href and href not in self.visited_scholar_pages:
-                    # For context, a typical paged Google Scholar link looks like this:
-                    # https://scholar.google.com/scholar?start=10&q=artificial+intelligence&hl=en&as_sdt=0,31
-                    # This bit grabs the starting position (the query parameter to start)
-
-                    start_str = ""
-                    start_pos = href.find("start=") + 6
-                    while href[start_pos].isdigit():
-                        start_str += href[start_pos]
-                        start_pos += 1
-                    
-                    start = int(start_str)
-                    if start < self.starting_result_limit:
-                        self.visited_scholar_pages.add(href)
-                        yield response.follow(href)
-            
-
-    def handle_follow(self, response):
-        if response.request.url.count("arxiv.org") > 0:
-            # arxiv.org logic
-            title = response.css(".title::text").get()
-            authors = response.css(".authors > a::text").getall()
-            abstract = "".join(response.css(".abstract::text").getall()).strip()
-
-            return {
-                "site": "arxiv.org",
+            # Select the href attribute
+            yield {
+                "site": "scholar.google.com",
+                "href": href,
                 "title": title,
-                # Potential application: find out which authors
-                # the researcher collaborates with the most
-                "authors": authors,
-                "abstract": abstract,
+                "pdf_link": pdf_link
             }
 
-        else:
-            raise NotImplementedError
+            # Follow the link
+            yield response.follow(href, self.handle_arxiv_follow)
+
+        # Grab links to additional results for selectors that are in tables
+        link_selectors_in_tables = response.xpath("//table//a")
+        for link_selector in link_selectors_in_tables:
+            href: str = link_selector.css("::attr(href)").get()
+            if "/scholar?start=" in href and href not in self.visited_scholar_pages:
+                # For context, a typical paged Google Scholar link looks like this:
+                # https://scholar.google.com/scholar?start=10&q=artificial+intelligence&hl=en&as_sdt=0,31
+                # This bit grabs the starting position (the query parameter to start)
+
+                start_str = ""
+                start_pos = href.find("start=") + 6
+                while href[start_pos].isdigit():
+                    start_str += href[start_pos]
+                    start_pos += 1
+                
+                start = int(start_str)
+                if start < self.starting_result_limit:
+                    self.visited_scholar_pages.add(href)
+                    yield response.follow(href)
+        
+
+    def handle_arxiv_follow(self, response, **kwargs):
+        # arxiv.org logic
+        title = response.css(".title::text").get()
+        authors = response.css(".authors > a::text").getall()
+        abstract = "".join(response.css(".abstract::text").getall()).strip()
+
+        return {
+            "site": "arxiv.org",
+            "title": title,
+            # Potential application: find out which authors
+            # the researcher collaborates with the most
+            "authors": authors,
+            "abstract": abstract,
+        }
+        
